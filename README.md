@@ -77,3 +77,8 @@ mvn test -Pintegration        # 集成测试（需本机 MySQL 与 hify_test sch
 
 - 开发规范、核心链路与风险地图：[CLAUDE.md](CLAUDE.md)
 - 接口文档：[docs/api/](docs/api/)
+
+## 系统架构
+![HIFY架构图](images/architecture.png)
+<img width="1705" height="704" alt="截屏2026-10-30 15 37 17" src="https://github.com/user-attachments/assets/ffdfb31f-d500-4aab-ae77-225c0382d908" />
+
