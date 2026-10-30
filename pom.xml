@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.16</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.hify</groupId>
+    <artifactId>hify</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Hify</name>
+    <description>简化版内部 AI Agent 平台（模块化单体 Modular Monolith）</description>
+
+    <!--
+      模块对应 CLAUDE.md 代码组织：
+        hify-common       → com.hify.common（config/exception/web/util）
+        hify-model        → com.hify.modules.model（LLM 提供商管理）
+        hify-knowledge    → com.hify.modules.knowledge（知识库 RAG）
+        hify-mcp          → com.hify.modules.mcp（MCP 工具接入）
+        hify-agent        → com.hify.modules.agent（Agent 配置）
+        hify-conversation → com.hify.modules.conversation（对话引擎 / SSE）
+        hify-workflow     → com.hify.modules.workflow（简版工作流）
+        hify-bootstrap    → 引导模块：HifyApplication + 配置文件，聚合全部模块产出可执行 jar
+
+      模块间依赖 DAG（只能依赖对方 api 包，由 ArchUnit 强制；此处声明 Maven 依赖）：
+        common      ← 所有模块
+        model       ← knowledge, agent, conversation, workflow
+        knowledge   ← conversation, workflow
+        mcp         ← conversation, workflow
+        agent       ← conversation
+        所有业务模块 ← bootstrap
+    -->
+    <modules>
+        <module>hify-common</module>
+        <module>hify-model</module>
+        <module>hify-knowledge</module>
+        <module>hify-mcp</module>
+        <module>hify-agent</module>
+        <module>hify-conversation</module>
+        <module>hify-workflow</module>
+        <module>hify-bootstrap</module>
+    </modules>
+
+    <properties>
+        <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- 覆盖 Spring Boot BOM 管理的 Lombok 版本 -->
+        <lombok.version>1.18.48</lombok.version>
+
+        <!-- 第三方版本统一在此声明 -->
+        <mybatis-plus.version>3.5.17</mybatis-plus.version>
+        <mapstruct.version>1.6.3</mapstruct.version>
+        <okhttp.version>4.12.0</okhttp.version>
+        <resilience4j.version>2.4.0</resilience4j.version>
+        <guava.version>33.7.2-jre</guava.version>
+        <!-- JSON 结构化日志（logback 编码器，配合 micrometer-tracing 的 MDC traceId） -->
+        <logstash-logback-encoder.version>8.0</logstash-logback-encoder.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- 内部模块 -->
+            <dependency>
+                <groupId>com.hify</groupId>
+                <artifactId>hify-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hify</groupId>
+                <artifactId>hify-model</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hify</groupId>
+                <artifactId>hify-knowledge</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hify</groupId>
+                <artifactId>hify-mcp</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hify</groupId>
+                <artifactId>hify-agent</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hify</groupId>
+                <artifactId>hify-conversation</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.hify</groupId>
+                <artifactId>hify-workflow</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- MyBatis-Plus（Spring Boot 3 starter） -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <!-- MyBatis-Plus 3.5.9+ 分页插件依赖的 JSqlParser 已独立成模块 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-jsqlparser</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <!-- MapStruct -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
+            </dependency>
+
+            <!-- OkHttp BOM（okhttp / logging-interceptor / okhttp-sse 版本统一） -->
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp-bom</artifactId>
+                <version>${okhttp.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Resilience4j BOM（熔断/重试/限流/舱壁版本统一） -->
+            <dependency>
+                <groupId>io.github.resilience4j</groupId>
+                <artifactId>resilience4j-bom</artifactId>
+                <version>${resilience4j.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Guava（ThreadFactoryBuilder 等） -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+
+            <!-- JSON 日志编码器 -->
+            <dependency>
+                <groupId>net.logstash.logback</groupId>
+                <artifactId>logstash-logback-encoder</artifactId>
+                <version>${logstash-logback-encoder.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- 仅 hify-bootstrap 执行 repackage，业务模块保持普通 jar -->
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+
+        <plugins>
+            <!-- 全局注解处理器：Lombok + MapStruct -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>0.2.0</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -1,0 +1,25 @@
+# --- Java / Maven ---
+target/
+*.jar
+*.class
+*.log
+
+# --- Node / 前端 ---
+node_modules/
+dist/
+*.local
+
+# --- IDE ---
+.idea/
+.vscode/
+*.iml
+
+# --- macOS ---
+.DS_Store
+
+# --- 运行时产物 ---
+logs/
+run/
+
+# --- 真实环境配置（只提交 .example 模板）---
+deploy/local/conf/hify.env

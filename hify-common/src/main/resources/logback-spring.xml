@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Hify 日志配置（全模块共享，置于 hify-common classpath 根）。
+
+  - prod（K8s/Docker）：stdout 输出 JSON 单行，字段
+      timestamp / level / traceId / spanId / thread / logger / message / stack_trace，
+    由节点日志 Agent 采集；traceId/spanId 来自 micrometer-tracing(OTel) 写入的 MDC。
+  - 其他环境（本地开发、tar 包默认）：stdout 可读文本，同样携带 traceId。
+  - 异步线程（llm-pool / llm-stream）的 MDC 由 MdcCopyingThreadPoolExecutor 在提交时拷贝。
+-->
+<configuration>
+
+    <springProfile name="prod">
+        <appender name="JSON_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+                <providers>
+                    <timestamp>
+                        <fieldName>timestamp</fieldName>
+                        <pattern>yyyy-MM-dd'T'HH:mm:ss.SSSXXX</pattern>
+                        <timeZone>Asia/Shanghai</timeZone>
+                    </timestamp>
+                    <logLevel>
+                        <fieldName>level</fieldName>
+                    </logLevel>
+                    <!--
+                      MDC 条目按原键名写为 JSON 顶层字段：
+                      micrometer-tracing(OTel) 自动写入 traceId/spanId；
+                      未来业务侧 MDC.put 的键（如 sessionId）也会一并出现在顶层。
+                    -->
+                    <mdc/>
+                    <threadName>
+                        <fieldName>thread</fieldName>
+                    </threadName>
+                    <loggerName>
+                        <fieldName>logger</fieldName>
+                    </loggerName>
+                    <message>
+                        <fieldName>message</fieldName>
+                    </message>
+                    <stackTrace>
+                        <fieldName>stack_trace</fieldName>
+                        <throwableConverter class="net.logstash.logback.stacktrace.ShortenedThrowableConverter">
+                            <maxDepthPerThrowable>30</maxDepthPerThrowable>
+                            <maxLength>4096</maxLength>
+                        </throwableConverter>
+                    </stackTrace>
+                </providers>
+            </encoder>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="JSON_STDOUT"/>
+        </root>
+    </springProfile>
+
+    <springProfile name="!prod">
+        <appender name="PLAIN_STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+            <encoder>
+                <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight(%-5level) [%thread] [traceId=%X{traceId:-},spanId=%X{spanId:-}] %cyan(%logger{36}) - %msg%n</pattern>
+            </encoder>
+        </appender>
+        <root level="INFO">
+            <appender-ref ref="PLAIN_STDOUT"/>
+        </root>
+    </springProfile>
+
+</configuration>

@@ -1,0 +1,32 @@
+# ============================================================
+# 集成测试环境（@Tag("integration")，mvn test -Pintegration 激活）
+# 前置：本机 MySQL 需存在独立 schema hify_test（与开发库 hify 隔离），
+#   CREATE DATABASE hify_test CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+#   GRANT ALL PRIVILEGES ON hify_test.* TO 'hify'@'127.0.0.1';
+# 表结构由各模块 classpath 上的 db/schema.sql 幂等初始化（CREATE TABLE IF NOT EXISTS）。
+# 不依赖外网、真实 LLM Key、Redis（Redis 仅惰性连接，测试链路不触发）。
+# ============================================================
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/hify_test?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: hify
+    # 占位符形态：本机默认值仅用于开发/测试，真实口令走环境变量注入
+    password: ${HIFY_TEST_MYSQL_PASSWORD:hify123}
+    hikari:
+      pool-name: HifyTestHikariCP
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 3000
+
+  # 每次上下文启动幂等建表（四模块 db/schema.sql 均为 CREATE TABLE IF NOT EXISTS，无外键顺序依赖）
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath*:db/schema.sql
+      encoding: UTF-8
+
+# 同步用例统一靠测试方法 @Transactional 自动回滚；此处不覆盖 MyBatis-Plus 主配置
+mybatis-plus:
+  global-config:
+    banner: false

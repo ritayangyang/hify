@@ -1,0 +1,11 @@
+# 构建镜像时不需要进入上下文的文件（依赖与产物全部在镜像内重新安装/构建）
+node_modules
+dist
+.git
+.gitignore
+Dockerfile
+.dockerignore
+npm-debug.log*
+*.md
+.vscode
+.idea

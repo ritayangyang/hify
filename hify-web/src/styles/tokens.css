@@ -1,0 +1,181 @@
+/**
+ * Hify Design Tokens
+ * 风格：浅底 + 科技感点缀；主色蓝紫系，辅色青色；深色侧边栏。
+ * 参考 Linear / Supabase：干净、冷静、低饱和中性色 + 高亮点缀。
+ *
+ * 所有自定义令牌统一 --hify- 前缀；Element Plus 桥接见 element-theme.css。
+ */
+:root {
+  /* ============================================================
+   * 主色：蓝紫系（Indigo）
+   * ============================================================ */
+  --hify-color-primary-50: #eef2ff;
+  --hify-color-primary-100: #e0e7ff;
+  --hify-color-primary-200: #c7d2fe;
+  --hify-color-primary-300: #a5b4fc;
+  --hify-color-primary-400: #818cf8;
+  --hify-color-primary-500: #6366f1; /* 品牌主色 */
+  --hify-color-primary-600: #4f46e5; /* hover */
+  --hify-color-primary-700: #4338ca; /* active */
+  --hify-color-primary-800: #3730a3;
+  --hify-color-primary-900: #312e81;
+
+  --hify-color-primary: var(--hify-color-primary-500);
+  --hify-color-primary-hover: var(--hify-color-primary-600);
+  --hify-color-primary-active: var(--hify-color-primary-700);
+  --hify-color-primary-soft: var(--hify-color-primary-50);
+
+  /* ============================================================
+   * 辅色：青色（Cyan）——科技感点缀
+   * ============================================================ */
+  --hify-color-cyan-50: #ecfeff;
+  --hify-color-cyan-100: #cffafe;
+  --hify-color-cyan-200: #a5f3fc;
+  --hify-color-cyan-300: #67e8f9;
+  --hify-color-cyan-400: #22d3ee; /* 亮色点缀 */
+  --hify-color-cyan-500: #06b6d4; /* 辅色 */
+  --hify-color-cyan-600: #0891b2;
+  --hify-color-cyan-700: #0e7490;
+
+  --hify-color-accent: var(--hify-color-cyan-500);
+  --hify-color-accent-bright: var(--hify-color-cyan-400);
+
+  /* ============================================================
+   * 语义色
+   * ============================================================ */
+  --hify-color-success: #16a34a;
+  --hify-color-success-soft: #f0fdf4;
+  --hify-color-warning: #f59e0b;
+  --hify-color-warning-soft: #fffbeb;
+  --hify-color-danger: #ef4444;
+  --hify-color-danger-soft: #fef2f2;
+  --hify-color-info: #6b7280;
+
+  /* ============================================================
+   * 背景色阶（冷调中性，偏蓝灰）
+   * ============================================================ */
+  --hify-bg-canvas: #f7f8fa;   /* 应用底色 */
+  --hify-bg-surface: #ffffff;  /* 卡片 / 表格 */
+  --hify-bg-subtle: #fbfbfd;   /* 次级容器 */
+  --hify-bg-muted: #f2f4f8;    /* 填充块 */
+  --hify-bg-hover: #f1f3f9;    /* 悬停态 */
+  --hify-bg-active: #e8ebf3;   /* 选中态（浅） */
+
+  /* ============================================================
+   * 边框色阶
+   * ============================================================ */
+  --hify-border-subtle: #eceef3;
+  --hify-border: #e3e6ee;
+  --hify-border-strong: #d1d6e1;
+  --hify-border-focus: var(--hify-color-primary-400);
+
+  /* ============================================================
+   * 文字色阶
+   * ============================================================ */
+  --hify-text-1: #10131a;      /* 主要文字 / 标题 */
+  --hify-text-2: #4a5061;      /* 常规正文 */
+  --hify-text-3: #8b909f;      /* 次要 / 说明 */
+  --hify-text-4: #b7bcc8;      /* 占位 / 禁用 */
+  --hify-text-inverse: #ffffff;
+
+  /* ============================================================
+   * 深色侧边栏
+   * ============================================================ */
+  --hify-sidebar-bg: #0b0e14;
+  --hify-sidebar-bg-elevated: #12151e;
+  --hify-sidebar-border: rgba(255, 255, 255, 0.08);
+  --hify-sidebar-text: rgba(255, 255, 255, 0.62);
+  --hify-sidebar-text-hover: rgba(255, 255, 255, 0.9);
+  --hify-sidebar-text-active: #ffffff;
+  --hify-sidebar-item-hover: rgba(255, 255, 255, 0.06);
+  --hify-sidebar-item-active: rgba(99, 102, 241, 0.18);
+  --hify-sidebar-item-active-glow: inset 2px 0 0 var(--hify-color-primary-400);
+
+  /* ============================================================
+   * 渐变（科技感点缀：Logo / 空态 / 关键 banner）
+   * ============================================================ */
+  --hify-gradient-brand: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  --hify-gradient-accent: linear-gradient(90deg, #22d3ee 0%, #6366f1 100%);
+  --hify-gradient-brand-cyan: linear-gradient(135deg, #6366f1 0%, #8b5cf6 55%, #22d3ee 130%);
+
+  /* ============================================================
+   * 圆角
+   * ============================================================ */
+  --hify-radius-xs: 4px;
+  --hify-radius-sm: 6px;
+  --hify-radius-md: 8px;
+  --hify-radius-lg: 10px;
+  --hify-radius-xl: 14px;
+  --hify-radius-2xl: 20px;
+  --hify-radius-pill: 9999px;
+
+  /* ============================================================
+   * 阴影（冷灰低透明，Linear 式克制层次）
+   * ============================================================ */
+  --hify-shadow-xs: 0 1px 2px 0 rgba(16, 18, 28, 0.05);
+  --hify-shadow-sm:
+    0 1px 3px rgba(16, 18, 28, 0.06),
+    0 1px 2px rgba(16, 18, 28, 0.04);
+  --hify-shadow-md:
+    0 4px 12px -2px rgba(16, 18, 28, 0.08),
+    0 2px 4px -2px rgba(16, 18, 28, 0.05);
+  --hify-shadow-lg:
+    0 12px 32px -4px rgba(16, 18, 28, 0.12),
+    0 4px 12px -4px rgba(16, 18, 28, 0.06);
+  --hify-shadow-xl:
+    0 24px 56px -8px rgba(16, 18, 28, 0.18),
+    0 8px 20px -8px rgba(16, 18, 28, 0.08);
+
+  /* 主色辉光：主按钮 hover / 焦点元素 / 选中态点缀 */
+  --hify-shadow-glow:
+    0 0 0 1px rgba(99, 102, 241, 0.25),
+    0 8px 24px -4px rgba(99, 102, 241, 0.4);
+  --hify-shadow-focus-ring: 0 0 0 3px rgba(99, 102, 241, 0.2);
+  --hify-shadow-cyan-glow: 0 6px 20px -4px rgba(34, 211, 238, 0.45);
+
+  /* ============================================================
+   * 过渡动效
+   * ============================================================ */
+  --hify-duration-fast: 120ms;
+  --hify-duration-base: 200ms;
+  --hify-duration-slow: 300ms;
+  --hify-duration-slower: 450ms;
+
+  --hify-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --hify-ease-emphasized: cubic-bezier(0.22, 1, 0.36, 1); /* ease-out-expo，进场/弹层 */
+  --hify-ease-in: cubic-bezier(0.4, 0, 1, 1);
+
+  /* 常用组合 */
+  --hify-transition-color:
+    color var(--hify-duration-fast) var(--hify-ease-standard),
+    background-color var(--hify-duration-fast) var(--hify-ease-standard),
+    border-color var(--hify-duration-fast) var(--hify-ease-standard);
+  --hify-transition-base: var(--hify-duration-base) var(--hify-ease-standard);
+  --hify-transition-emphasized: var(--hify-duration-slow) var(--hify-ease-emphasized);
+
+  /* ============================================================
+   * 排版与层级
+   * ============================================================ */
+  --hify-font-family:
+    'Inter', 'SF Pro Text', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --hify-font-mono:
+    'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, Consolas, monospace;
+
+  --hify-font-size-xs: 12px;
+  --hify-font-size-sm: 13px;
+  --hify-font-size-base: 14px;
+  --hify-font-size-lg: 16px;
+  --hify-font-size-xl: 18px;
+  --hify-font-size-2xl: 22px;
+
+  --hify-line-height-tight: 1.35;
+  --hify-line-height-base: 1.6;
+
+  --hify-z-dropdown: 1000;
+  --hify-z-sticky: 1020;
+  --hify-z-modal: 1050;
+  --hify-z-toast: 1080;
+
+  --hify-sidebar-width: 220px;
+}

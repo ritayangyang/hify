@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.hify</groupId>
+        <artifactId>hify</artifactId>
+        <version>0.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>hify-bootstrap</artifactId>
+    <name>Hify :: Bootstrap</name>
+    <description>引导模块：HifyApplication 入口与全局配置，聚合全部业务模块，产出唯一可执行 jar</description>
+
+    <properties>
+        <!-- 默认不限制包含分组；集成测试分组默认排除，-Pintegration 时反转 -->
+        <test.include.groups></test.include.groups>
+        <test.exclude.groups>integration</test.exclude.groups>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.hify</groupId>
+            <artifactId>hify-common</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.hify</groupId>
+            <artifactId>hify-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.hify</groupId>
+            <artifactId>hify-knowledge</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.hify</groupId>
+            <artifactId>hify-mcp</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.hify</groupId>
+            <artifactId>hify-agent</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.hify</groupId>
+            <artifactId>hify-conversation</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.hify</groupId>
+            <artifactId>hify-workflow</artifactId>
+        </dependency>
+
+        <!-- 集成测试：@SpringBootTest + MockMvc + AssertJ/JsonPath，仅测试期 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- 集成测试：mock 掉外部 LLM/提供商 HTTP 端点（版本由 okhttp-bom 管理） -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>mockwebserver</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- 仅此模块打可执行 fat jar；业务模块保持普通 jar 供复用与未来拆分 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!--
+              集成测试默认排除：用 @Tag("integration") 标记，普通 mvn test 不跑（不依赖本机 MySQL）。
+              mvn test -Pintegration 时只跑 integration 分组。
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <groups>${test.include.groups}</groups>
+                    <excludedGroups>${test.exclude.groups}</excludedGroups>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- mvn test -Pintegration：仅执行 @Tag("integration") 用例（需本机 hify_test 库） -->
+        <profile>
+            <id>integration</id>
+            <properties>
+                <test.include.groups>integration</test.include.groups>
+                <test.exclude.groups></test.exclude.groups>
+            </properties>
+        </profile>
+    </profiles>
+</project>

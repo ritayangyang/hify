@@ -1,0 +1,23 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--hify-font-family);
+  font-size: var(--hify-font-size-base);
+  line-height: var(--hify-line-height-base);
+  color: var(--hify-text-2);
+  background-color: var(--hify-bg-canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  height: 100vh;
+}

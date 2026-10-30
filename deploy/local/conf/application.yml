@@ -1,0 +1,83 @@
+# ============================================================
+# Hify 本地部署配置模板
+#
+# 所有环境差异通过环境变量注入（来源二选一）：
+#   1. 启动前 export，如 HIFY_MYSQL_HOST=10.0.0.1 bin/start.sh
+#   2. 复制本目录 hify.env.example 为 hify.env 后填写，start.sh 自动加载
+# 已导出的环境变量优先于 hify.env；冒号后是未设置时的默认值。
+#
+# 本文件位于 conf/ 下，由 start.sh 通过 spring.config.additional-location 加载，
+# 同名字段覆盖 jar 包内的开发配置；未列出的字段仍沿用 jar 包内默认值。
+# ============================================================
+
+server:
+  port: ${HIFY_SERVER_PORT:8080}
+  # 优雅停机：配合 bin/stop.sh 的 SIGTERM，等待在途请求（含 SSE）结束
+  shutdown: graceful
+
+spring:
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  mvc:
+    async:
+      # SSE 超时上限（与 SseEmitter(200s) 对齐）
+      request-timeout: 200000
+
+  # ---------- MySQL（外部必备依赖） ----------
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${HIFY_MYSQL_HOST:127.0.0.1}:${HIFY_MYSQL_PORT:3306}/${HIFY_MYSQL_DATABASE:hify}?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${HIFY_MYSQL_USER:hify}
+    password: ${HIFY_MYSQL_PASSWORD:hify123}
+    hikari:
+      pool-name: HifyHikariCP
+      maximum-pool-size: 20
+      minimum-idle: 5
+      connection-timeout: 3000
+      max-lifetime: 1800000
+
+  # ---------- Redis（预留：本期上下文走 MySQL，未实际使用，可暂不部署） ----------
+  data:
+    redis:
+      host: ${HIFY_REDIS_HOST:127.0.0.1}
+      port: ${HIFY_REDIS_PORT:6379}
+      database: ${HIFY_REDIS_DATABASE:0}
+      password: ${HIFY_REDIS_PASSWORD:}
+      timeout: 3000ms
+
+# ---------- Hify 自身配置 ----------
+hify:
+  # 前端静态资源目录，start.sh 默认指向包内 dist 绝对路径
+  web:
+    dir: ${HIFY_WEB_DIR:./dist}
+  # pgvector 为知识库模块预留（knowledge 上线前不会建立任何连接，可暂不部署）
+  pgvector:
+    host: ${HIFY_PGVECTOR_HOST:127.0.0.1}
+    port: ${HIFY_PGVECTOR_PORT:5432}
+    database: ${HIFY_PGVECTOR_DATABASE:hify_vector}
+    username: ${HIFY_PGVECTOR_USER:hify}
+    password: ${HIFY_PGVECTOR_PASSWORD:}
+
+# ---------- Actuator / Tracing ----------
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  tracing:
+    sampling:
+      probability: 1.0
+
+# ---------- MyBatis-Plus（与 jar 内默认保持一致，列出便于现场调整） ----------
+mybatis-plus:
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    default-enum-type-handler: com.baomidou.mybatisplus.core.handlers.MybatisEnumTypeHandler
+  global-config:
+    banner: false
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
